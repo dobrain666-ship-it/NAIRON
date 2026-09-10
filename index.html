@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>ɴᴀɪʀᴏɴ x ᴍᴀᴠɪᴀ</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html, body { height:100%; overflow:hidden; background:#000; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; color:#fff; }
+  #stars { position:fixed; inset:0; z-index:0; pointer-events:none; }
+  .star { position:absolute; background:#fff; border-radius:50%; opacity:.6; animation:twinkle 3s infinite ease-in-out; }
+  @keyframes twinkle { 0%,100%{opacity:.2;} 50%{opacity:.9;} }
+  .screen { position:fixed; inset:0; z-index:1; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:24px; opacity:0; pointer-events:none; transition:opacity .8s ease, transform .8s ease; }
+  .screen.active { opacity:1; pointer-events:auto; }
+  .screen.exit-left{transform:translateX(-60px);opacity:0;}
+  .screen.exit-right{transform:translateX(60px);opacity:0;}
+  .screen.enter-right{transform:translateX(60px);opacity:0;}
+  .screen.enter-left{transform:translateX(-60px);opacity:0;}
+  #intro{justify-content:center;}
+  .intro-ring{width:120px;height:120px;border-radius:50%;border:2px solid transparent;border-top-color:#00e5ff;border-right-color:#b14dff;animation:spin 1.2s linear infinite;position:relative;}
+  .intro-ring::after{content:'';position:absolute;inset:12px;border-radius:50%;border:2px solid transparent;border-bottom-color:#00e5ff;border-left-color:#b14dff;animation:spin .9s linear infinite reverse;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+  .intro-text{margin-top:40px;font-size:28px;letter-spacing:6px;font-weight:600;background:linear-gradient(90deg,#00e5ff,#b14dff,#00e5ff);background-size:200% auto;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;opacity:0;animation:fadeInText 1.6s ease 1s forwards,shine 3s linear infinite;text-align:center;}
+  @keyframes fadeInText{to{opacity:1;letter-spacing:10px;}}
+  @keyframes shine{to{background-position:200% center;}}
+  .intro-sub{margin-top:12px;font-size:11px;letter-spacing:4px;color:#556;text-transform:uppercase;opacity:0;animation:fadeInText 1s ease 2s forwards;}
+  .brand{position:absolute;top:40px;left:0;right:0;text-align:center;font-size:18px;letter-spacing:6px;font-weight:600;background:linear-gradient(90deg,#00e5ff,#b14dff);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;}
+  .auth-title{font-size:13px;letter-spacing:4px;color:#667;margin-bottom:30px;text-transform:uppercase;}
+  .auth-box,.search-box{width:100%;max-width:340px;display:flex;flex-direction:column;gap:16px;}
+  .input-wrap{position:relative;}
+  .input-wrap input{width:100%;padding:18px 20px;background:rgba(255,255,255,.03);border:1px solid rgba(0,229,255,.3);border-radius:14px;color:#fff;font-size:18px;letter-spacing:2px;outline:none;transition:border-color .3s,box-shadow .3s;font-family:inherit;}
+  .input-wrap input::placeholder{color:#445;letter-spacing:3px;}
+  .input-wrap input:focus{border-color:#00e5ff;box-shadow:0 0 24px rgba(0,229,255,.2);}
+  .btn{width:100%;padding:18px;border:none;border-radius:14px;background:linear-gradient(90deg,#00e5ff,#b14dff);color:#000;font-size:15px;font-weight:700;letter-spacing:4px;cursor:pointer;transition:transform .2s,box-shadow .2s;font-family:inherit;text-transform:uppercase;}
+  .btn:active{transform:scale(.97);}
+  .btn:hover{box-shadow:0 0 30px rgba(0,229,255,.4);}
+  .btn:disabled{opacity:.5;cursor:not-allowed;}
+  #result{justify-content:flex-start;padding-top:70px;overflow-y:auto;}
+  #maintenanceScreen{justify-content:center;padding-top:24px;}
+  .result-card{width:100%;max-width:380px;background:rgba(255,255,255,.03);border:1px solid rgba(0,229,255,.25);border-radius:18px;padding:24px 22px;display:flex;flex-direction:column;gap:16px;animation:slideUp .6s ease;backdrop-filter:blur(6px);}
+  @keyframes slideUp{from{transform:translateY(30px);opacity:0;}to{transform:translateY(0);opacity:1;}}
+  .row{display:flex;flex-direction:column;gap:4px;}
+  .row .label{font-size:10px;letter-spacing:3px;color:#00e5ff;text-transform:uppercase;opacity:.8;}
+  .row .value{font-size:15px;color:#fff;word-break:break-word;line-height:1.5;}
+  .divider{height:1px;background:linear-gradient(90deg,transparent,rgba(0,229,255,.3),transparent);}
+  .error-card{width:100%;max-width:380px;border:1px solid rgba(255,60,60,.4);background:rgba(255,60,60,.06);border-radius:18px;padding:40px 24px;text-align:center;animation:slideUp .6s ease;}
+  .error-card .err-title{font-size:22px;letter-spacing:6px;font-weight:700;color:#ff4d4d;margin-bottom:8px;}
+  .error-card .err-sub{font-size:12px;color:#a66;letter-spacing:2px;}
+  .maint-card{width:100%;max-width:380px;border:1px solid rgba(255,180,0,.4);background:rgba(255,180,0,.06);border-radius:18px;padding:40px 24px;text-align:center;animation:slideUp .6s ease;}
+  .maint-card .m-title{font-size:22px;letter-spacing:6px;font-weight:700;color:#ffb400;margin-bottom:8px;}
+  .maint-card .m-sub{font-size:12px;color:#a86;letter-spacing:2px;}
+  .back-btn{margin-top:22px;background:transparent;border:1px solid rgba(0,229,255,.4);color:#00e5ff;padding:12px 30px;border-radius:12px;font-size:12px;letter-spacing:3px;cursor:pointer;text-transform:uppercase;font-family:inherit;transition:background .3s;}
+  .back-btn:hover{background:rgba(0,229,255,.1);}
+  #loader{position:fixed;inset:0;z-index:100;background:rgba(0,0,0,.85);display:none;flex-direction:column;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
+  #loader.active{display:flex;}
+  .loader-ring{width:60px;height:60px;border-radius:50%;border:2px solid transparent;border-top-color:#00e5ff;border-right-color:#b14dff;animation:spin .9s linear infinite;}
+  .loader-text{margin-top:20px;font-size:11px;letter-spacing:5px;color:#00e5ff;text-transform:uppercase;animation:pulse 1.4s ease infinite;}
+  @keyframes pulse{0%,100%{opacity:.4;}50%{opacity:1;}}
+  ::-webkit-scrollbar{width:4px;}
+  ::-webkit-scrollbar-thumb{background:rgba(0,229,255,.3);border-radius:4px;}
+</style>
+</head>
+<body>
+
+<div id="stars"></div>
+
+<div class="screen active" id="intro">
+  <div class="intro-ring"></div>
+  <div class="intro-text">ɴᴀɪʀᴏɴ x ᴍᴀᴠɪᴀ</div>
+  <div class="intro-sub">initializing</div>
+</div>
+
+<div class="screen" id="auth">
+  <div class="brand">ɴᴀɪʀᴏɴ x ᴍᴀᴠɪᴀ</div>
+  <div class="auth-title">enter access key</div>
+  <div class="auth-box">
+    <div class="input-wrap">
+      <input type="password" id="passInput" placeholder="••••••••" autocomplete="off" />
+    </div>
+    <button class="btn" id="unlockBtn">UNLOCK</button>
+  </div>
+</div>
+
+<div class="screen" id="search">
+  <div class="brand">ɴᴀɪʀᴏɴ x ᴍᴀᴠɪᴀ</div>
+  <div class="search-box">
+    <div class="input-wrap">
+      <input type="tel" id="numberInput" placeholder="03xxxxxxxx" inputmode="numeric" maxlength="11" autocomplete="off" />
+    </div>
+    <button class="btn" id="getBtn">GET</button>
+  </div>
+</div>
+
+<div class="screen" id="result">
+  <div class="brand">ɴᴀɪʀᴏɴ x ᴍᴀᴠɪᴀ</div>
+  <div id="resultContent" style="width:100%;display:flex;flex-direction:column;align-items:center;"></div>
+</div>
+
+<div class="screen" id="maintenanceScreen">
+  <div class="brand">ɴᴀɪʀᴏɴ x ᴍᴀᴠɪᴀ</div>
+  <div class="maint-card">
+    <div class="m-title">MAINTENANCE</div>
+    <div class="m-sub">site is under maintenance</div>
+  </div>
+</div>
+
+<div id="loader">
+  <div class="loader-ring"></div>
+  <div class="loader-text" id="loaderText">searching</div>
+</div>
+
+<script>
+(function(){const c=document.getElementById('stars');let h='';for(let i=0;i<60;i++){const x=Math.random()*100,y=Math.random()*100,s=Math.random()*2+.5,d=Math.random()*3;h+=`<div class="star" style="left:${x}%;top:${y}%;width:${s}px;height:${s}px;animation-delay:${d}s"></div>`;}c.innerHTML=h;})();
+
+const screens={intro:document.getElementById('intro'),auth:document.getElementById('auth'),search:document.getElementById('search'),result:document.getElementById('result'),maint:document.getElementById('maintenanceScreen')};
+function goTo(from,to,dir){const f=screens[from],t=screens[to];if(dir==='left'){f.classList.add('exit-left');t.classList.add('enter-right');}if(dir==='right'){f.classList.add('exit-right');t.classList.add('enter-left');}setTimeout(()=>t.classList.add('active'),30);setTimeout(()=>{f.classList.remove('active','exit-left','exit-right','enter-left','enter-right');t.classList.remove('enter-left','enter-right');},800);}
+function goToMaint(from){const f=screens[from],t=screens.maint;f.classList.add('exit-left');setTimeout(()=>t.classList.add('active'),30);setTimeout(()=>{f.classList.remove('active','exit-left');},800);}
+
+setTimeout(()=>goTo('intro','auth','left'),4200);
+
+const passInput=document.getElementById('passInput');
+const unlockBtn=document.getElementById('unlockBtn');
+async function tryUnlock(){
+  const pw=passInput.value;
+  if(!pw){shake(passInput.parentElement);return;}
+  unlockBtn.disabled=true;
+  try{
+    const res=await fetch('/api/auth',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:pw})});
+    const data=await res.json().catch(()=>({}));
+    if(data.maintenance){goToMaint('auth');return;}
+    if(data.success){
+      passInput.value='';
+      if(data.role==='admin'){window.location.href='/admin';return;}
+      goTo('auth','search','left');
+      setTimeout(()=>document.getElementById('numberInput').focus(),900);
+    }else{
+      shake(passInput.parentElement);passInput.value='';passInput.placeholder='wrong key';
+      setTimeout(()=>passInput.placeholder='••••••••',1500);
+    }
+  }catch(e){shake(passInput.parentElement);passInput.value='';}
+  unlockBtn.disabled=false;
+}
+unlockBtn.addEventListener('click',tryUnlock);
+passInput.addEventListener('keydown',e=>{if(e.key==='Enter')tryUnlock();});
+
+const input=document.getElementById('numberInput');
+input.addEventListener('input',e=>{e.target.value=e.target.value.replace(/\D/g,'').slice(0,11);});
+
+const btn=document.getElementById('getBtn');
+const loader=document.getElementById('loader');
+const resultContent=document.getElementById('resultContent');
+btn.addEventListener('click',doSearch);
+input.addEventListener('keydown',e=>{if(e.key==='Enter')doSearch();});
+
+async function doSearch(){
+  const num=input.value.trim();
+  if(num.length<10){shake(input.parentElement);return;}
+  loader.classList.add('active');
+  btn.disabled=true;
+  try{
+    const res=await fetch('/api/search?query='+encodeURIComponent(num));
+    const data=await res.json().catch(()=>null);
+    await new Promise(r=>setTimeout(r,500));
+    loader.classList.remove('active');btn.disabled=false;
+    if(data&&data.maintenance){goToMaint('search');return;}
+    if(!data||data.success===false){showError('DATA NOT FOUND');return;}
+    const item=(data.data&&data.data[0])||null;
+    if(!item){showError('DATA NOT FOUND');return;}
+    showResult(item);
+  }catch(e){await new Promise(r=>setTimeout(r,300));loader.classList.remove('active');btn.disabled=false;showError('DATA NOT FOUND');}
+}
+
+function showResult(item){
+  const rows=[
+    {label:'Name',value:item.name||'N/A'},
+    {label:'Mobile',value:item.mobile||'N/A'},
+    {label:'CNIC',value:item.cnic||'N/A'},
+    {label:'Address',value:item.address||'N/A'},
+    {label:'Num2Name',value:(item.Num2Name===null||item.Num2Name===undefined||item.Num2Name==='')?'N/A':item.Num2Name},
+  ];
+  let h='<div class="result-card">';
+  rows.forEach((r,i)=>{h+=`<div class="row"><div class="label">${r.label}</div><div class="value">${esc(String(r.value))}</div></div>`;if(i<rows.length-1)h+='<div class="divider"></div>';});
+  h+='</div><button class="back-btn" id="backBtn">back</button>';
+  resultContent.innerHTML=h;
+  goTo('search','result','left');
+  setTimeout(()=>document.getElementById('result').scrollTo({top:0,behavior:'smooth'}),300);
+  document.getElementById('backBtn').addEventListener('click',()=>goTo('result','search','right'));
+}
+function showError(msg){
+  resultContent.innerHTML=`<div class="error-card"><div class="err-title">${msg}</div><div class="err-sub">no record available</div></div><button class="back-btn" id="backBtn">back</button>`;
+  goTo('search','result','left');
+  document.getElementById('backBtn').addEventListener('click',()=>goTo('result','search','right'));
+}
+function shake(el){el.animate([{transform:'translateX(0)'},{transform:'translateX(-8px)'},{transform:'translateX(8px)'},{transform:'translateX(-6px)'},{transform:'translateX(6px)'},{transform:'translateX(0)'}],{duration:400,easing:'ease-in-out'});}
+function esc(s){return s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+</script>
+</body>
+</html>
