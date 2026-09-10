@@ -1,0 +1,10 @@
+{
+  "token": "hsmdz_2026_secure_9xAk!kL",
+  "api_base": "https://db-service-pk.vercel.app/api/search",
+  "maintenance": false,
+  "passwords": {
+    "NAIRON": "NAIRON",
+    "MAVIA": "MAVIA",
+    "ADMIN-16": "2580"
+  }
+}
